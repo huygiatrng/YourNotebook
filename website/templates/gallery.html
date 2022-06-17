@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title_name %}Gallery{% endblock %}
+
+{% block content %}
+    <br/>
+    <div class="form-1-container section-container">
+        <div class="row">
+            <div class="col-md-10 offset-md-1 form-1-box wow fadeInUp">
+                <form action="" enctype=multipart/form-data method="POST">
+                    <fieldset class="form-group border p-3">
+                        <legend class="w-auto px-2" class="font-weight-bold">Upload Image</legend>
+                        <div class="form-group">
+                            <input type="file" id="picture" name="picture"/>
+                            <input class="btn btn-primary" type="submit" value="Submit">
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+
+
+            <div class="container-fluid">
+                <br/>
+                <h4>Your Gallery</h4>
+                <div class="row" id="images">
+                    {% for image in user.images %}
+                        <div class="col-md-4 p-2">
+                            <div class="d-flex flex-column text-center border height100">
+                                <div>
+                                    <img src="{{ url_for('static', filename="images/"+image.name_location) }}"
+                                         class="img-fluid">
+                                </div>
+                                <h2>
+                                    <a href="{{ url_for('static', filename="images/"+image.name_location) }}">{{ image.name }}</a>
+                                </h2>
+                                <p>{{ image.date }}</p>
+
+                                <button type="button" class="close" onClick="deleteImage({{ image.id }})">
+                                    <span aria-hidden="true">Delete</span>
+                                </button>
+                                </br>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
