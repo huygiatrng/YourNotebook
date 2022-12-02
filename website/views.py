@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, flash, jsonify, current_app, session
+from PIL import Image as ImagePIL
 from flask_login import login_required, current_user
 from .models import Page, Image
 from . import db
@@ -6,22 +7,71 @@ import json
 import os
 import secrets
 import imghdr
+import requests
+import io
+import base64
 
 views = Blueprint('views', __name__)
+success = False
 
 
 def save_photo(photo):
     rand_hex = secrets.token_hex(10)
     _, file_extention = photo.filename.rsplit('.', 1)
     file_name = rand_hex + '.' + file_extention
-    file_path = os.path.join(current_app.root_path, 'static/images/', file_name)
+    file_path = os.path.join(current_app.root_path, 'static\\images\\', file_name)
     while os.path.exists(file_path):
         rand_hex = secrets.token_hex(10)
         _, file_extention = os.path.splitext(photo.filename)
         file_name = rand_hex + file_extention
-        file_path = os.path.join(current_app.root_path, 'static/images/', file_name)
+        file_path = os.path.join(current_app.root_path, 'static\\images\\', file_name)
     photo.save(file_path)
     return file_name, file_path
+
+
+def save_photo_removeBackground(photo):
+    success = False
+    rand_hex = secrets.token_hex(10)
+    _, file_extension = photo.filename.rsplit('.', 1)
+    file_name = rand_hex + '.' + file_extension
+    file_name_output = rand_hex + ".png"
+    file_path = os.path.join(current_app.root_path, 'static/remove_background/input', file_name)
+    file_path_out = os.path.join(current_app.root_path, 'static/remove_background/output', file_name_output)
+    while os.path.exists(file_path):
+        rand_hex = secrets.token_hex(10)
+        _, file_extension = os.path.splitext(photo.filename)
+        file_name = rand_hex + '.' + file_extension
+        file_name_output = rand_hex + ".png"
+        file_path = os.path.join(current_app.root_path, 'static/remove_background/input', file_name)
+        file_path_out = os.path.join(current_app.root_path, 'static/remove_background/output', file_name_output)
+    photo.save(file_path)
+    photo.save(file_path_out)
+
+    try:
+        code = "python -m website.AITool.demo.image_matting.colab.inference --input-path \"" + str(
+            file_path) + "\" --output-path \"" + str(
+            file_path_out) + "\" --ckpt-path \"website/AITool/pretrained/modnet_photographic_portrait_matting.ckpt\""
+        os.system(code)
+        success = True
+    except Exception as e:
+        print("Error: " + e)
+        success = False
+        flash("Cannot find the object in image, try again!", category='error')
+
+    # response = requests.post(
+    #     'https://www.cutout.pro/api/v1/matting?mattingType=6',
+    #     files={'file': open(file_path, 'rb')},
+    #     headers={'APIKEY': 'My api key'},
+    # )
+    # if response.status_code == requests.codes.ok:
+    #     print("Found image")
+    #     with open(file_path_out, 'wb') as out:
+    #         out.write(response.content)
+    #     success = True
+    # else:
+    #     print("Error:", response.status_code, response.text)
+    #     flash("Cannot find the object in image, try again!", category='error')
+    return file_name_output, file_path, file_path_out, file_extension, success
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -45,12 +95,50 @@ def home():
 
     return render_template("home.html", user=current_user, sortStatus=sortStatus)
 
+
 def allowed_image(photo):
     if (str(imghdr.what(photo))).upper() in {'PNG', 'JPEG', 'JPG', 'GIF', 'TIFF', 'RAW', 'WEBP', 'PSD', 'BMP', 'HEIF',
                                              'INDD'}:
         return True
     else:
         return False
+
+
+@views.route('/removebckg', methods=['GET', 'POST'])
+@login_required
+def removebckg():
+    if request.method == "POST":
+        if request.files:
+            inputpic = request.files["pictureForRemoveBackground"]
+            if allowed_image(inputpic):
+                try:
+                    temp1, temp2, resultPath, file_extension, success = save_photo_removeBackground(inputpic)
+                    flash('Image added!', category='success')
+                except Exception as e:
+                    print(e)
+                    flash("Something wrong and the image cannot be added.", category='error')
+                # if success == False:
+                #     return render_template("Removebckg.html", user=current_user, result=None)
+                # else:
+                try:
+                    im = ImagePIL.open(resultPath)
+                    data = io.BytesIO()
+                    im.save(data, "PNG")
+                    encoded_img_data = base64.b64encode(data.getvalue())
+                    return render_template("Removebckg.html", user=current_user, result=resultPath, nameImg=temp1,
+                                           img_data=encoded_img_data.decode('utf-8'))
+                except Exception as e:
+                    flash("Something wrong, please try again!", category='error')
+                    print(e)
+                    return render_template("Removebckg.html", user=current_user, result=None)
+            else:
+                flash("Please upload valid image file!", category='error')
+                return render_template("Removebckg.html", user=current_user, result=None)
+        else:
+            flash("Please upload valid image file!", category='error')
+            return render_template("Removebckg.html", user=current_user, result=None)
+    else:
+        return render_template("Removebckg.html", user=current_user, result=None)
 
 
 @views.route('/gallery', methods=['GET', 'POST'])
@@ -103,11 +191,12 @@ def delete_page():
             db.session.commit()
     return jsonify({})
 
+
 @views.route('/sort-page', methods=['POST'])
 def sort_page():
     data = json.loads(request.data)
     sortStatus = data['sortStatus']
-    if sortStatus=="UP":
+    if sortStatus == "UP":
         session['sortStatus'] = "UP"
         sortStatus = "UP"
     else:

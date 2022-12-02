@@ -3,7 +3,7 @@ footer section p {
     background-color: #007bff;
 }
 
-body {
+#body {
     height: 100vh;
     margin: 0;
     display: flex;
@@ -19,8 +19,8 @@ header {
 }
 
 #footer {
-    position:absolute;
-    min-height: 25px;
+    position:static;
+    min-height: 150px;
     margin-top: auto;
     padding: 10px 10px 0px 10px;
     bottom: 0;
@@ -31,3 +31,15 @@ header {
     position: relative;
     min-height: 85vh;
 }
+
+#resultImg{
+    width: 800px;
+}
+#resultImgBox {
+}
+
+img{
+    border: 4px solid #9281B2;
+    padding: 10px;
+}
+

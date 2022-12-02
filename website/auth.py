@@ -5,6 +5,7 @@ from . import db
 from flask_login import login_user, login_required, logout_user, current_user
 import re
 
+
 auth = Blueprint('auth', __name__)
 
 regex_email = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
@@ -30,7 +31,6 @@ def isValidPassword(password):
         return True
     else:
         return False
-
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -65,6 +65,7 @@ def sign_up():
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
         user = User.query.filter_by(email=email).first()
+        user_temp2 =  User.query.filter_by(username=username).first()
         if user:
             flash('There is an account with this email. Please try another email.', category='error')
         elif not isValidEmail(email):
@@ -75,6 +76,8 @@ def sign_up():
             flash('Invalid password! Please try again.', category='error')
         elif password1 != password2:
             flash('The passwords don\'t match.', category='error')
+        elif user_temp2:
+            flash('Username has been existed, try again with another username.', category='error')
         else:
             new_user = User(email=email, username=username, password=generate_password_hash(password1, method='sha256'))
             db.session.add(new_user)

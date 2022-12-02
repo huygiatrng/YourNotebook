@@ -31,7 +31,11 @@
                                          class="img-fluid">
                                 </div>
                                 <h2>
-                                    <a href="{{ url_for('static', filename="images/"+image.name_location) }}">{{ image.name }}</a>
+                                    {% if image.name|length > 13 %}
+                                        <a href="{{ url_for('static', filename="images/"+image.name_location) }}">{{ image.name[:9]+"..."+ image.name[-4:]}} </a>
+                                    {% else %}
+                                        <a href="{{ url_for('static', filename="images/"+image.name_location) }}">{{ image.name }}</a>
+                                    {% endif %}
                                 </h2>
                                 <p>{{ image.date }}</p>
 
