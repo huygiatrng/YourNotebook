@@ -136,9 +136,6 @@ if __name__ == '__main__':
     matte = matte[0][0].data.cpu().numpy()
     matte = Image.fromarray(((matte * 255).astype('uint8')), mode='L')
 
-    print("Type of image:" + str(type(image)))
-    print("Type of matte:" + str(type(matte)))
     combination = combined_display(image,matte)
-    print("Type of combination:" + str(type(combination)))
 
     combination.save(args.output_path)
