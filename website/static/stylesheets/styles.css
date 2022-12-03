@@ -38,8 +38,16 @@ header {
 #resultImgBox {
 }
 
-img{
-    border: 4px solid #9281B2;
-    padding: 10px;
+.text-center {
+  text-align: center;
 }
 
+img{
+    border: 4px solid #9281B2;
+    padding: 4px;
+}
+
+#saveToGallery{
+    position: relative;
+    padding:10px;
+}

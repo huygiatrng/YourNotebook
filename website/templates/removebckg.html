@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title_name %}Remove Background{% endblock %}
+
+{% block content %}
+
+    <br/>
+    <div class="form-1-container section-container">
+        <div class="row">
+            <div class="col-md-10 offset-md-1 form-1-box wow fadeInUp">
+                <form action="" enctype=multipart/form-data method="POST">
+                    <fieldset class="form-group border p-3">
+                        <legend class="w-auto px-2" class="font-weight-bold">Upload images you want to remove
+                            background:
+                        </legend>
+                        <div class="form-group">
+                            <input type="file" id="pictureForRemoveBackground" name="pictureForRemoveBackground"/>
+                            <input class="btn btn-primary" type="submit" value="Submit">
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <br/>
+        {% if result!=None %}
+            <div align="center" id="resultImgBox">
+                <img id="resultImg" src="data:image/jpeg;base64,{{ img_data }}">
+            </div>
+            <br/>
+            <div class="text-center">
+                <button type="submit"  id="saveToGallery"
+                        onClick="saveRemovedBackgroundImg({{ current_img }})">
+                    <span class="text-center" aria-hidden="true">Save to Gallery</span>
+                </button>
+            </div>
+        {% else %}
+            <div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+
+

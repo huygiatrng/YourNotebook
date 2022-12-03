@@ -7,6 +7,15 @@ function deleteImage(imageId) {
     });
 }
 
+function saveRemovedBackgroundImg(imageRId){
+    fetch("/save-output-img",{
+        method:"POST",
+        body: JSON.stringify({imageRId: imageRId}),
+    }).then((_res) => {
+        window.location.href = "/gallery";
+    });
+}
+
 function deletePage(pageId) {
     fetch("/delete-page", {
         method: "POST",

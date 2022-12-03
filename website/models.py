@@ -2,15 +2,23 @@ from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 
+class ImageToRemoveBackground(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    input_location = db.Column(db.String(150), nullable=False)
+    output_location = db.Column(db.String(150), nullable=False)
+    input_img_name = db.Column(db.String(150), nullable=False)
+    output_img_name = db.Column(db.String(150), nullable=False)
+    mimetype = db.Column(db.Text, nullable = False)
+    date = db.Column(db.DateTime(timezone=True), default=func.now())
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name_location = db.Column(db.String(150), nullable=False)
     img_path = db.Column(db.String(150), nullable=False)
     name = db.Column(db.String(150), nullable=False)
+    mimetype = db.Column(db.Text, nullable=False)
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
 
 class Page(db.Model):
     id = db.Column(db.Integer, primary_key=True)
