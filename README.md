@@ -21,4 +21,5 @@ Database of website is built on SQLAlchemy.
 Authentication with Flask-login.
 
 **Preview**
-
+![Screenshot 2022-12-05 195728](https://user-images.githubusercontent.com/67343196/205779619-41c7b3ed-60d6-4d95-b5b0-49889c154086.jpg)
+![Screenshot 2022-12-05 200226](https://user-images.githubusercontent.com/67343196/205780120-2a5b8bc6-fcc1-42ea-9576-4d428a159ce7.jpg)
