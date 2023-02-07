@@ -1,4 +1,4 @@
-# Personal Notebook using Flask as web framework
+# Your Notebook
 The website allows users to create separate accounts and save notes and photos on them.
 You can remove the background of your picture and save it in your gallery to access them later.
 
